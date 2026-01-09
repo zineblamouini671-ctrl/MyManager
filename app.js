@@ -1,10 +1,13 @@
 // App Initialization
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Init Auth
     Auth.init();
 
     // Init Mock Data
     if (typeof MockData !== 'undefined') MockData.init();
+
+    // Init DataService
+    if (typeof DataService !== 'undefined') await DataService.init();
 
     // Init Router
     Router.init();

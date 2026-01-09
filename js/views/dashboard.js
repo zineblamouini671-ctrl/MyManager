@@ -120,6 +120,11 @@ const DashboardView = {
     },
 
     init: () => {
+        // Update KPI
+        DataService.getUsers().then(users => {
+            document.getElementById('kpi-users').textContent = users.length;
+        });
+
         // Line Chart
         new Chart(document.getElementById('lineChart'), {
             type: 'line',

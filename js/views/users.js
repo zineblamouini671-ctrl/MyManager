@@ -291,8 +291,6 @@ const UsersView = {
             } else {
                 // Create
                 const newUser = await API.post('/users', userData);
-                // JSONPlaceholder returns fixed ID 11 usually, so let's fake a random ID for UI uniqueness if needed
-                if (!newUser.id) newUser.id = Math.floor(Math.random() * 1000) + 11;
                 UsersView.state.users.push(newUser);
             }
 
