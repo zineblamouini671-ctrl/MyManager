@@ -90,5 +90,12 @@ const Utils = {
     setLang: (lang) => {
         localStorage.setItem('lang', lang);
         location.reload(); // Rechargement simple pour appliquer les changements
+    },
+
+    resetData: () => {
+        if (confirm('Voulez-vous vraiment réinitialiser toutes les données ? Cela effacera vos modifications et rechargera les données fictives.')) {
+            localStorage.clear();
+            location.reload();
+        }
     }
 };
