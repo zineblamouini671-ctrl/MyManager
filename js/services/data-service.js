@@ -11,8 +11,14 @@ const DataService = {
     init: async () => {
         // Helper pour initialiser une entité si elle est manquante
         const initEntity = (key, mockData) => {
-            if (!localStorage.getItem(key)) {
-                localStorage.setItem(key, JSON.stringify(mockData || []));
+            const stored = localStorage.getItem(key);
+            let data = [];
+            try { data = JSON.parse(stored); } catch (e) { }
+
+            if (!stored || !Array.isArray(data) || data.length === 0) {
+                if (mockData && mockData.length > 0) {
+                    localStorage.setItem(key, JSON.stringify(mockData));
+                }
             }
         };
 
@@ -21,25 +27,13 @@ const DataService = {
         initEntity(DataService.KEYS.CLIENTS, MockData.clients);
         initEntity(DataService.KEYS.INVOICES, MockData.invoices);
 
-        // Utilisateurs et Commandes (Initialisation Complexe)
+        // Utilisateurs et Commandes (Initialisation Simplifiée avec MockData)
         let users = JSON.parse(localStorage.getItem(DataService.KEYS.USERS));
-        if (!users) {
-            try {
-                users = await API.get('https://jsonplaceholder.typicode.com/users'); // Récupération directe pour éviter la récursion si l'API est interceptée
-                // Si l'API est interceptée, cela pourrait échouer si non géré, mais pour l'instant supposons un démarrage valide
-                // En fait, puisque nous réécrivons l'API, nous devrions utiliser fetch natif ici ou l'API standard
-                // MAIS API.get utilisera optionnellement DataService, provoquant une boucle.
-                // Donc on utilise fetch natif pour l'amorçage initial si strictement nécessaire.
-                const res = await fetch('https://jsonplaceholder.typicode.com/users');
-                users = await res.json();
-
-                // Ajouter les champs généralement manquants dans le mock
-                users = users.map(u => ({ ...u, role: 'User' }));
-                localStorage.setItem(DataService.KEYS.USERS, JSON.stringify(users));
-            } catch (e) {
-                console.warn('Fallback to empty users', e);
-                users = [];
-            }
+        // Note: MockData.init() gère déjà l'initialisation du localStorage pour les utilisateurs s'ils sont absents.
+        // Donc nous devons juste nous assurer de les lire.
+        if (!users || users.length === 0) {
+            users = MockData.users || [];
+            localStorage.setItem(DataService.KEYS.USERS, JSON.stringify(users));
         }
 
         let orders = JSON.parse(localStorage.getItem(DataService.KEYS.ORDERS));
