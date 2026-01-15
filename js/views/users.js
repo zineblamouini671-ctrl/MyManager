@@ -1,5 +1,5 @@
 const UsersView = {
-    // State for this view
+    // État pour cette vue
     state: {
         users: [],
         filteredUsers: [],
@@ -11,8 +11,8 @@ const UsersView = {
     },
 
     init: async () => {
-        // Fetch users if not already in store (or fetch fresh)
-        // For this demo, let's fetch fresh or use Store if implemented fully
+        // Récupérer les utilisateurs s'ils ne sont pas déjà dans le store (ou en récupérer de nouveaux)
+        // Pour cette démo, récupérons-en de nouveaux ou utilisons le Store s'il est entièrement implémenté
         const users = await API.get('/users');
         if (users) {
             UsersView.state.users = users;
@@ -20,25 +20,25 @@ const UsersView = {
             UsersView.renderTable();
         }
 
-        // Attach Event Listeners (Since render() overwrites DOM, we might need to re-attach or delegate)
-        // Best approach: Attach to static container or re-attach after render. 
-        // Here we'll attach to the container in renderTable or separate setup.
+        // Attacher les écouteurs d'événements (Puisque render() écrase le DOM, nous devrons peut-être les réattacher ou déléguer)
+        // Meilleure approche : Attacher au conteneur statique ou réattacher après le rendu.
+        // Ici, nous attacherons au conteneur dans renderTable ou une configuration séparée.
         UsersView.setupEventListeners();
     },
 
     setupEventListeners: () => {
-        // Search Input
+        // Champ de recherche
         const searchInput = document.getElementById('user-search');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 UsersView.state.searchTerm = e.target.value;
-                UsersView.state.currentPage = 1; // Reset to first page
+                UsersView.state.currentPage = 1; // Réinitialiser à la première page
                 UsersView.filterAndSort();
                 UsersView.renderTable();
             });
         }
 
-        // Sort Headers
+        // En-têtes de tri
         const headers = document.querySelectorAll('th[data-sort]');
         headers.forEach(th => {
             th.addEventListener('click', () => {
@@ -55,7 +55,7 @@ const UsersView = {
             });
         });
 
-        // Pagination Buttons
+        // Boutons de pagination
         document.getElementById('prev-btn')?.addEventListener('click', () => {
             if (UsersView.state.currentPage > 1) {
                 UsersView.state.currentPage--;
@@ -71,7 +71,7 @@ const UsersView = {
             }
         });
 
-        // Export Buttons
+        // Boutons d'exportation
         document.getElementById('export-csv')?.addEventListener('click', UsersView.exportCSV);
         document.getElementById('add-user-btn')?.addEventListener('click', () => UsersView.openModal());
     },
@@ -79,7 +79,7 @@ const UsersView = {
     filterAndSort: () => {
         let result = [...UsersView.state.users];
 
-        // Search
+        // Recherche
         if (UsersView.state.searchTerm) {
             const term = UsersView.state.searchTerm.toLowerCase();
             result = result.filter(user =>
@@ -88,7 +88,7 @@ const UsersView = {
             );
         }
 
-        // Sort
+        // Tri
         const { sortBy, sortOrder } = UsersView.state;
         result.sort((a, b) => {
             let valA = a[sortBy];
@@ -148,7 +148,7 @@ const UsersView = {
                             </tr>
                         </thead>
                         <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
-                            <!-- Rows rendered via JS -->
+                            <!-- Lignes rendues via JS -->
                         </tbody>
                     </table>
                 </div>
@@ -165,7 +165,7 @@ const UsersView = {
                 </div>
             </div>
             
-            <!-- User Modal (Create/Edit) -->
+            <!-- Modal Utilisateur (Créer/Modifier) -->
             <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center">
                 <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
                     <h2 id="modal-title" class="text-xl font-bold mb-4">Add User</h2>
@@ -199,12 +199,12 @@ const UsersView = {
 
         const { filteredUsers, currentPage, itemsPerPage } = UsersView.state;
 
-        // Pagin logic
+        // Logique de pagination
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         const pageItems = filteredUsers.slice(start, end);
 
-        // Update counts
+        // Mettre à jour les comptes
         document.getElementById('start-index').textContent = filteredUsers.length > 0 ? start + 1 : 0;
         document.getElementById('end-index').textContent = Math.min(end, filteredUsers.length);
         document.getElementById('total-items').textContent = filteredUsers.length;
@@ -236,7 +236,7 @@ const UsersView = {
             </tr>
         `).join('');
 
-        // Disable buttons if needed
+        // Désactiver les boutons si nécessaire
         document.getElementById('prev-btn').disabled = currentPage === 1;
         document.getElementById('prev-btn').classList.toggle('opacity-50', currentPage === 1);
         const maxPage = Math.ceil(filteredUsers.length / itemsPerPage);
@@ -257,7 +257,7 @@ const UsersView = {
     deleteUser: async (id) => {
         if (confirm('Are you sure you want to delete this user?')) {
             await API.delete(`/users/${id}`);
-            // Optimistic update
+            // Mise à jour optimiste
             UsersView.state.users = UsersView.state.users.filter(u => u.id !== id);
             UsersView.filterAndSort();
             UsersView.renderTable();
@@ -269,7 +269,7 @@ const UsersView = {
         document.getElementById('user-modal').classList.remove('hidden');
         document.getElementById('modal-title').textContent = isEdit ? 'Edit User' : 'Add User';
 
-        // Form submit handler
+        // Gestionnaire de soumission de formulaire
         const form = document.getElementById('user-form');
         form.onsubmit = async (e) => {
             e.preventDefault();
@@ -281,15 +281,15 @@ const UsersView = {
             const userData = { name, email, website };
 
             if (isEdit && id) {
-                // Update
+                // Mettre à jour
                 await API.put(`/users/${id}`, userData);
-                // Update local state
+                // Mettre à jour l'état local
                 const idx = UsersView.state.users.findIndex(u => u.id == id);
                 if (idx !== -1) {
                     UsersView.state.users[idx] = { ...UsersView.state.users[idx], ...userData };
                 }
             } else {
-                // Create
+                // Créer
                 const newUser = await API.post('/users', userData);
                 UsersView.state.users.push(newUser);
             }
@@ -318,7 +318,7 @@ const UsersView = {
     },
 
     viewDetails: (id) => {
-        // Navigate to details (using hash param or session)
+        // Naviguer vers les détails (en utilisant un paramètre de hachage ou une session)
         window.location.hash = `#user-details?id=${id}`;
     },
 

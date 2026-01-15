@@ -1,6 +1,6 @@
 const Auth = {
     login: (username, password) => {
-        // Static check as per requirements
+        // Vérification statique selon les exigences
         if (username === 'admin' && password === 'admin') {
             const user = { username: 'admin', role: 'admin', name: 'Administrator' };
             Store.setUser(user);
@@ -16,12 +16,12 @@ const Auth = {
 
     checkAuth: () => {
         if (!Store.state.currentUser) {
-            // If not logged in and not on login page, redirect
+            // Si non connecté et pas sur la page de connexion, rediriger
             if (window.location.hash !== '#login') {
                 window.location.hash = '#login';
             }
         } else {
-            // If logged in and on login page, redirect to dashboard
+            // Si connecté et sur la page de connexion, rediriger vers le tableau de bord
             if (window.location.hash === '#login' || window.location.hash === '') {
                 window.location.hash = '#dashboard';
             }
@@ -29,10 +29,10 @@ const Auth = {
     },
 
     init: () => {
-        // Check initial auth state
+        // Vérifier l'état d'authentification initial
         Auth.checkAuth();
 
-        // Listen for hash changes to protect routes
+        // Écouter les changements de hachage pour protéger les routes
         window.addEventListener('hashchange', Auth.checkAuth);
     }
 };

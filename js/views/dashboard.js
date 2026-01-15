@@ -13,9 +13,9 @@ const DashboardView = {
                 </div>
             </div>
 
-            <!-- KPI Cards -->
+            <!-- Cartes KPI -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <!-- Card 1 -->
+                <!-- Carte 1 -->
                 <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary card-hover">
                     <div class="flex items-center">
                         <div class="p-3 bg-blue-100 rounded-full text-blue-500 mr-4">
@@ -29,7 +29,7 @@ const DashboardView = {
                     </div>
                 </div>
 
-                 <!-- Card 2 -->
+                 <!-- Carte 2 -->
                 <div class="bg-white rounded-lg shadow p-6 border-l-4 border-secondary card-hover">
                     <div class="flex items-center">
                         <div class="p-3 bg-green-100 rounded-full text-green-500 mr-4">
@@ -43,7 +43,7 @@ const DashboardView = {
                     </div>
                 </div>
 
-                <!-- Card 3 -->
+                <!-- Carte 3 -->
                 <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500 card-hover">
                     <div class="flex items-center">
                         <div class="p-3 bg-purple-100 rounded-full text-purple-500 mr-4">
@@ -57,7 +57,7 @@ const DashboardView = {
                     </div>
                 </div>
 
-                <!-- Card 4 -->
+                <!-- Carte 4 -->
                 <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500 card-hover">
                     <div class="flex items-center">
                          <div class="p-3 bg-yellow-100 rounded-full text-yellow-500 mr-4">
@@ -72,9 +72,9 @@ const DashboardView = {
                 </div>
             </div>
 
-            <!-- Charts Grid -->
+            <!-- Grille des graphiques -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <!-- Line Chart -->
+                <!-- Graphique linéaire -->
                 <div class="bg-white p-6 rounded-lg shadow">
                     <h3 class="text-lg font-bold text-gray-700 mb-4">Revenue Growth</h3>
                     <div class="relative h-64 w-full">
@@ -82,7 +82,7 @@ const DashboardView = {
                     </div>
                 </div>
 
-                <!-- Bar Chart -->
+                <!-- Graphique en barres -->
                 <div class="bg-white p-6 rounded-lg shadow">
                     <h3 class="text-lg font-bold text-gray-700 mb-4">Users per Region</h3>
                     <div class="relative h-64 w-full">
@@ -92,7 +92,7 @@ const DashboardView = {
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <!-- Doughnut Chart -->
+                <!-- Graphique en beignet -->
                 <div class="bg-white p-6 rounded-lg shadow">
                     <h3 class="text-lg font-bold text-gray-700 mb-4">Device Usage</h3>
                     <div class="relative h-48 w-full flex justify-center">
@@ -100,7 +100,7 @@ const DashboardView = {
                     </div>
                 </div>
 
-                 <!-- Pie Chart -->
+                 <!-- Graphique circulaire -->
                 <div class="bg-white p-6 rounded-lg shadow">
                     <h3 class="text-lg font-bold text-gray-700 mb-4">Order Status</h3>
                     <div class="relative h-48 w-full flex justify-center">
@@ -108,7 +108,7 @@ const DashboardView = {
                     </div>
                 </div>
 
-                <!-- Polar Area Chart -->
+                <!-- Graphique en zone polaire -->
                 <div class="bg-white p-6 rounded-lg shadow">
                     <h3 class="text-lg font-bold text-gray-700 mb-4">User Activity Impact</h3>
                     <div class="relative h-48 w-full flex justify-center">
@@ -120,12 +120,12 @@ const DashboardView = {
     },
 
     init: () => {
-        // Update KPI
+        // Mettre à jour les KPI
         DataService.getUsers().then(users => {
             document.getElementById('kpi-users').textContent = users.length;
         });
 
-        // Line Chart
+        // Graphique linéaire
         new Chart(document.getElementById('lineChart'), {
             type: 'line',
             data: {
@@ -142,7 +142,7 @@ const DashboardView = {
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Bar Chart
+        // Graphique en barres
         new Chart(document.getElementById('barChart'), {
             type: 'bar',
             data: {
@@ -156,7 +156,7 @@ const DashboardView = {
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Doughnut Chart
+        // Graphique en beignet
         new Chart(document.getElementById('doughnutChart'), {
             type: 'doughnut',
             data: {
@@ -169,7 +169,7 @@ const DashboardView = {
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Pie Chart
+        // Graphique circulaire
         new Chart(document.getElementById('pieChart'), {
             type: 'pie',
             data: {
@@ -182,7 +182,7 @@ const DashboardView = {
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Polar Area Chart
+        // Graphique en zone polaire
         new Chart(document.getElementById('polarChart'), {
             type: 'polarArea',
             data: {
