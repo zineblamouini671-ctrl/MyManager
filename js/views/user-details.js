@@ -1,44 +1,48 @@
 const UserDetailsView = {
     render: async () => {
-        // Parse ID from hash: #user-details?id=1
+        // Analyser l'ID depuis le hash : #user-details?id=1
         const params = new URLSearchParams(window.location.hash.split('?')[1]);
         const id = params.get('id');
 
         if (!id) return '<div class="p-6 text-red-500">User ID missing</div>';
 
-        // Fetch single user
-        const user = await API.get(`/users/${id}`);
-        // Fetch posts for this user for more details
-        const posts = await API.get(`/users/${id}/posts`);
+        // Récupérer un seul utilisateur
+        // const user = await API.get(`/users/${id}`);
+        const users = await API.get('/users');
+        const user = users.find(u => u.id == id);
 
-        if (!user) return '<div class="p-6 text-red-500">User not found</div>';
+        // Récupérer les commandes pour cet utilisateur - en utilisant une route spéciale supportée par notre nouvelle logique API.js
+        const orders = await API.get(`/users/${id}/orders`) || []; // I need to implement this in API.js or use manual filter if not supported.
+        .
 
-        // PDF Export Handler attached to window or delegate
-        window.exportUserPDF = () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+        if(!user) return '<div class="p-6 text-red-500">User not found</div>';
 
-            doc.setFontSize(20);
-            doc.text(`User Report: ${user.name}`, 20, 20);
+    // Gestionnaire d'export PDF attaché à window ou délégué
+    window.exportUserPDF = () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-            doc.setFontSize(12);
-            doc.text(`ID: ${user.id}`, 20, 30);
-            doc.text(`Email: ${user.email}`, 20, 40);
-            doc.text(`Phone: ${user.phone}`, 20, 50);
-            doc.text(`Website: ${user.website}`, 20, 60);
-            doc.text(`Company: ${user.company.name}`, 20, 70);
+        doc.setFontSize(20);
+        doc.text(`User Report: ${user.name}`, 20, 20);
 
-            doc.text('Recent Posts:', 20, 90);
-            let y = 100;
-            posts.slice(0, 5).forEach((p, i) => {
-                doc.text(`${i + 1}. ${p.title.substring(0, 50)}...`, 20, y);
-                y += 10;
-            });
+        doc.setFontSize(12);
+        doc.text(`ID: ${user.id}`, 20, 30);
+        doc.text(`Email: ${user.email}`, 20, 40);
+        doc.text(`Phone: ${user.phone}`, 20, 50);
+        doc.text(`Website: ${user.website}`, 20, 60);
+        doc.text(`Company: ${user.company.name}`, 20, 70);
 
-            doc.save(`User_${user.name}.pdf`);
-        };
+        doc.text('Recent Posts:', 20, 90);
+        let y = 100;
+        posts.slice(0, 5).forEach((p, i) => {
+            doc.text(`${i + 1}. ${p.title.substring(0, 50)}...`, 20, y);
+            y += 10;
+        });
 
-        return `
+        doc.save(`User_${user.name}.pdf`);
+    };
+
+    return `
             <div class="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
                 <div class="flex justify-between items-start mb-8 border-b pb-6">
                     <div class="flex items-center">
@@ -62,7 +66,7 @@ const UserDetailsView = {
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Contact Info -->
+                    <!-- Informations de contact -->
                     <div>
                         <h3 class="text-xl font-semibold mb-4 text-gray-700">Contact Information</h3>
                         <div class="space-y-3">
@@ -81,7 +85,7 @@ const UserDetailsView = {
                         </div>
                     </div>
 
-                    <!-- Company Info -->
+                    <!-- Informations sur l'entreprise -->
                      <div>
                         <h3 class="text-xl font-semibold mb-4 text-gray-700">Company</h3>
                         <div class="bg-gray-50 p-4 rounded-lg">
@@ -92,7 +96,7 @@ const UserDetailsView = {
                     </div>
                 </div>
 
-                <!-- Address -->
+                <!-- Adresse -->
                  <div class="mt-8">
                     <h3 class="text-xl font-semibold mb-4 text-gray-700">Address</h3>
                     <div class="bg-gray-50 p-4 rounded-lg flex items-start">
@@ -104,19 +108,29 @@ const UserDetailsView = {
                     </div>
                 </div>
 
-                <!-- Recent Activity (Posts) -->
+                <!-- Commandes récentes -->
                 <div class="mt-8">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-700">Recent Posts</h3>
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700">Recent Orders (${orders.length})</h3>
                     <div class="space-y-4">
-                        ${posts.slice(0, 3).map(post => `
-                            <div class="border rounded p-4 hover:shadow-md transition">
-                                <h4 class="font-bold text-lg mb-2">${post.title}</h4>
-                                <p class="text-gray-600 text-sm">${post.body}</p>
+                        ${orders.length > 0 ? orders.map(order => `
+                            <div class="border rounded p-4 hover:shadow-md transition flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-lg">Order #${order.id}</h4>
+                                    <p class="text-gray-600 text-sm">Date: ${order.date || 'N/A'}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-gray-800">${Utils.formatCurrency(order.total)}</p>
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold 
+                                        ${order.status === 'Completed' ? 'bg-green-100 text-green-600' :
+            order.status === 'Pending' ? 'bg-yellow-100 text-yellow-600' : 'bg-red-100 text-red-600'}">
+                                        ${order.status}
+                                    </span>
+                                </div>
                             </div>
-                        `).join('')}
+                        `).join('') : '<p class="text-gray-500">No recent orders found.</p>'}
                     </div>
                 </div>
             </div>
         `;
-    }
+}
 };

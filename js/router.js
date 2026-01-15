@@ -66,7 +66,7 @@ const Router = {
 
     init: () => {
         window.addEventListener('hashchange', Router.navigate);
-        Router.navigate(); // Initial load
+        Router.navigate(); // Chargement initial
     },
 
     navigate: async () => {
@@ -77,11 +77,11 @@ const Router = {
             return;
         }
 
-        // Active Link Logic
+        // Logique du lien actif
         const links = document.querySelectorAll('aside nav a');
         links.forEach(l => {
             const href = l.getAttribute('href');
-            // Check for exact match or sub-route (e.g. #users match #users/123 if we had that, but here we strip query params)
+            // Vérifier la correspondance exacte ou la sous-route (ex: #users correspond à #users/123 si on avait ça, mais ici on enlève les paramètres de requête)
             const cleanHash = hash.split('?')[0];
             if (cleanHash === href) {
                 l.className = 'bg-gray-800 text-white border-l-4 border-secondary group flex items-center px-3 py-3 text-sm font-medium rounded-r-md transition-colors';
@@ -92,27 +92,27 @@ const Router = {
 
         const container = document.getElementById('view-container');
 
-        // Dynamic Routes (Check startsWith first for parameterized routes)
+        // Routes dynamiques (Vérifier startsWith d'abord pour les routes paramétrées)
         if (hash.startsWith('#user-details')) {
             container.innerHTML = await UserDetailsView.render();
             return;
         }
 
-        // Exact Match Routes
+        // Routes à correspondance exacte
         if (Router.routes[hash]) {
-            // Check if it's a function or string
+            // Vérifier si c'est une fonction ou une chaîne
             const result = Router.routes[hash]();
-            // If Promise (async), await it
+            // Si Promise (async), l'attendre
             container.innerHTML = result instanceof Promise ? await result : result;
 
-            // Post-render hooks
+            // Hooks après rendu
             if (hash === '#dashboard' && DashboardView.init) DashboardView.init();
             if (hash === '#users' && UsersView.init) UsersView.init();
 
-            // Init for Generic CRUD views if they exist
+            // Init pour les vues CRUD génériques si elles existent
             if (window.CurrentCrudView && window.CurrentCrudView.init) {
                 window.CurrentCrudView.init();
-                window.CurrentCrudView = null; // Reset
+                window.CurrentCrudView = null; // Réinitialiser
             }
 
             return;

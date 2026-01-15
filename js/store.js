@@ -1,6 +1,6 @@
 const Store = {
     state: {
-        currentUser: JSON.parse(localStorage.getItem('user')) || null,
+        // Initialiser l'état selon les exigences
         users: [],
         posts: [],
         isLoading: false

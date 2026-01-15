@@ -15,9 +15,9 @@ class GenericCrudView {
     }
 
     render() {
-        // Set global reference for Router to call init()
+        // Définir la référence globale pour Router pour appeler init()
         window.CurrentCrudView = this;
-        // Set global reference for DOM event handlers
+        // Définir la référence globale pour les gestionnaires d'événements DOM
         window.ActiveCrudView = this;
 
         const title = Utils.capitalize(this.endpoint);
@@ -58,7 +58,7 @@ class GenericCrudView {
                             </tr>
                         </thead>
                         <tbody id="crud-table-body" class="bg-white divide-y divide-gray-200">
-                            <!-- Rows rendered via JS -->
+                            <!-- Lignes rendues via JS -->
                         </tbody>
                     </table>
                 </div>
@@ -75,7 +75,7 @@ class GenericCrudView {
                 </div>
             </div>
             
-            <!-- Generic Modal -->
+            <!-- Modal Générique -->
             <div id="crud-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center">
                 <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
                     <h2 id="modal-title" class="text-xl font-bold mb-4">Add Item</h2>
@@ -116,14 +116,14 @@ class GenericCrudView {
 
     async init() {
         const data = await API.get(`/${this.endpoint}`);
-        // If data is null/undefined, default to empty array or try fetching from MockData if needed
-        // Assuming API works or MockData is populated in API response
+        // Si les données sont nulles/non définies, par défaut tableau vide ou essayer de récupérer depuis MockData si nécessaire
+        // En supposant que l'API fonctionne ou que MockData est peuplé dans la réponse API
         this.state.data = Array.isArray(data) ? data : [];
 
-        // If empty and we have mock data locally (as fallback), strict API might not use it, 
-        // but let's trust API or MockData fallback.
-        // Actually MockData isn't automatically used by API object unless implemented.
-        // But let's assume API works.
+        // Si vide et que nous avons des données fictives localement (comme secours), l'API stricte pourrait ne pas l'utiliser,
+        // mais faisons confiance à l'API ou au repli MockData.
+        // En fait MockData n'est pas automatiquement utilisé par l'objet API sauf si implémenté.
+        // Mais supposons que l'API fonctionne.
 
         this.filterAndSort();
         this.renderTable();
@@ -139,7 +139,7 @@ class GenericCrudView {
         const end = start + itemsPerPage;
         const pageItems = filteredData.slice(start, end);
 
-        // Update counts
+        // Mettre à jour les comptes
         document.getElementById('start-index').textContent = filteredData.length > 0 ? start + 1 : 0;
         document.getElementById('end-index').textContent = Math.min(end, filteredData.length);
         document.getElementById('total-items').textContent = filteredData.length;
@@ -162,7 +162,7 @@ class GenericCrudView {
             </tr>
         `).join('');
 
-        // Update Buttons
+        // Mettre à jour les boutons
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const maxPage = Math.ceil(filteredData.length / itemsPerPage);
@@ -222,7 +222,7 @@ class GenericCrudView {
     filterAndSort() {
         let result = [...this.state.data];
 
-        // Filter
+        // Filtrer
         if (this.state.searchTerm) {
             const term = this.state.searchTerm.toLowerCase();
             result = result.filter(item => {
@@ -232,7 +232,7 @@ class GenericCrudView {
             });
         }
 
-        // Sort
+        // Trier
         const { sortBy, sortOrder } = this.state;
         result.sort((a, b) => {
             let valA = a[sortBy];
@@ -297,14 +297,14 @@ class GenericCrudView {
         });
 
         if (id) {
-            // Update
+            // Mettre à jour
             await API.put(`/${this.endpoint}/${id}`, formData);
             const idx = this.state.data.findIndex(i => i.id == id);
             if (idx !== -1) {
                 this.state.data[idx] = { ...this.state.data[idx], ...formData };
             }
         } else {
-            // Create
+            // Créer
             const newItem = await API.post(`/${this.endpoint}`, formData);
             if (!newItem.id) newItem.id = Math.floor(Math.random() * 10000); // shim
             this.state.data.push(newItem);
