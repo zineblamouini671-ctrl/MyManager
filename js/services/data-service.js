@@ -32,7 +32,14 @@ const DataService = {
         // Note: MockData.init() gère déjà l'initialisation du localStorage pour les utilisateurs s'ils sont absents.
         // Donc nous devons juste nous assurer de les lire.
         if (!users || users.length === 0) {
-            users = MockData.users || [];
+            // Fallback robuste : Utiliser MockData.users OU une liste en dur si MockData est mis en cache (ancien)
+            users = (MockData && MockData.users) ? MockData.users : [
+                { id: 1, name: 'Yassine Bonou', email: 'y.bonou@example.com', role: 'Admin', website: 'bonou.dev', phone: '0600000001', company: { name: 'Atlas Corp', catchPhrase: 'Solutions durables', bs: 'tech marketing' }, address: { street: 'Av. Mohammed V', suite: 'Apt. 101', city: 'Casablanca', zipcode: '20000' } },
+                { id: 2, name: 'Houda Benyamina', email: 'h.benyamina@example.com', role: 'User', website: 'houda.design', phone: '0600000002', company: { name: 'Creativa', catchPhrase: 'Design innovant', bs: 'media design' }, address: { street: 'Rue Zerktouni', suite: 'Suite 200', city: 'Rabat', zipcode: '10000' } },
+                { id: 3, name: 'Mehdi El Glaoui', email: 'm.elglaoui@example.com', role: 'User', website: 'mehdi.codes', phone: '0600000003', company: { name: 'Maroc Digital', catchPhrase: 'Transformation numérique', bs: 'consulting' }, address: { street: 'Bd Anfa', suite: 'Etage 5', city: 'Casablanca', zipcode: '20100' } },
+                { id: 4, name: 'Sofia Amrani', email: 's.amrani@example.com', role: 'Manager', website: 'sofia.biz', phone: '0600000004', company: { name: 'Invest MA', catchPhrase: 'Investir pour demain', bs: 'finance' }, address: { street: 'Av. Hassan II', suite: 'Bureau 12', city: 'Marrakech', zipcode: '40000' } },
+                { id: 5, name: 'Omar Kabbaj', email: 'o.kabbaj@example.com', role: 'User', website: 'kabbaj.logistics', phone: '0600000005', company: { name: 'TransLog', catchPhrase: 'Logistique rapide', bs: 'logistics' }, address: { street: 'Zone Industrielle', suite: 'Hangar 3', city: 'Tanger', zipcode: '90000' } }
+            ];
             localStorage.setItem(DataService.KEYS.USERS, JSON.stringify(users));
         }
 

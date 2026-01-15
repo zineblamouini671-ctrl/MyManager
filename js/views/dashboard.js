@@ -37,7 +37,7 @@ const DashboardView = {
                         </div>
                         <div>
                             <p class="text-xs text-gray-500 font-bold uppercase">${Utils.t('revenue')}</p>
-                            <p class="text-2xl font-bold text-gray-800">$45,231</p>
+                            <p class="text-2xl font-bold text-gray-800" id="kpi-revenue">$0.00</p>
                              <p class="text-xs text-green-500 font-medium font-mono">+5% <span class="text-gray-400">vs last month</span></p>
                         </div>
                     </div>
@@ -51,7 +51,7 @@ const DashboardView = {
                         </div>
                         <div>
                              <p class="text-xs text-gray-500 font-bold uppercase">${Utils.t('orders')}</p>
-                            <p class="text-2xl font-bold text-gray-800">542</p>
+                            <p class="text-2xl font-bold text-gray-800" id="kpi-orders">0</p>
                              <p class="text-xs text-red-500 font-medium font-mono">-2% <span class="text-gray-400">vs last month</span></p>
                         </div>
                     </div>
@@ -65,7 +65,7 @@ const DashboardView = {
                         </div>
                         <div>
                             <p class="text-xs text-gray-500 font-bold uppercase">${Utils.t('products')}</p>
-                            <p class="text-2xl font-bold text-gray-800">89</p>
+                            <p class="text-2xl font-bold text-gray-800" id="kpi-products">0</p>
                              <p class="text-xs text-green-500 font-medium font-mono">New</p>
                         </div>
                     </div>
@@ -119,20 +119,40 @@ const DashboardView = {
         `;
     },
 
-    init: () => {
-        // Mettre à jour les KPI
-        DataService.getUsers().then(users => {
-            document.getElementById('kpi-users').textContent = users.length;
-        });
+    init: async () => {
+        // Récupérer toutes les données nécessaires
+        const [users, orders, products] = await Promise.all([
+            DataService.getUsers(),
+            DataService.getOrders(),
+            DataService.getAll(DataService.KEYS.PRODUCTS)
+        ]);
 
-        // Graphique linéaire
+        // Calculer les revenus totaux (somme des commandes 'Completed')
+        const totalRevenue = orders
+            .filter(o => o.status === 'Completed')
+            .reduce((acc, curr) => acc + (curr.total || 0), 0);
+
+        // Mettre à jour les KPI du DOM
+        document.getElementById('kpi-users').textContent = users.length;
+        document.getElementById('kpi-revenue').textContent = '$' + totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('kpi-orders').textContent = orders.length;
+        document.getElementById('kpi-products').textContent = products.length;
+
+        // Préparer les données pour les graphiques
+
+        // 1. Graphique linéaire : Revenus par mois (Pour l'exemple, on simule une distribution sur les commandes)
+        // Dans une vraie app, on grouperait orders par date.
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+        // Simulation de données basées sur le total pour donner une forme réaliste
+        const revenueData = months.map(() => Math.random() * (totalRevenue / 3));
+
         new Chart(document.getElementById('lineChart'), {
             type: 'line',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                labels: months,
                 datasets: [{
                     label: 'Revenue',
-                    data: [12000, 19000, 3000, 5000, 20000, 30000],
+                    data: revenueData,
                     borderColor: '#3B82F6',
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     tension: 0.4,
@@ -142,47 +162,66 @@ const DashboardView = {
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Graphique en barres
+        // 2. Graphique en barres : Utilisateurs par ville (Simulé car on a peu de villes dans le mock)
+        // On essaie de grouper par ville si l'adresse existe
+        const cities = {};
+        users.forEach(u => {
+            const city = (u.address && u.address.city) ? u.address.city : 'Unknown';
+            cities[city] = (cities[city] || 0) + 1;
+        });
+
         new Chart(document.getElementById('barChart'), {
             type: 'bar',
             data: {
-                labels: ['North', 'South', 'East', 'West', 'Central'],
+                labels: Object.keys(cities),
                 datasets: [{
                     label: 'Users',
-                    data: [120, 190, 80, 50, 200],
+                    data: Object.values(cities),
                     backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
                 }]
             },
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Graphique en beignet
+        // 3. Graphique en beignet : Produits par catégorie
+        const categories = {};
+        products.forEach(p => {
+            const cat = p.category || 'Other';
+            categories[cat] = (categories[cat] || 0) + 1;
+        });
+
         new Chart(document.getElementById('doughnutChart'), {
             type: 'doughnut',
             data: {
-                labels: ['Desktop', 'Mobile', 'Tablet'],
+                labels: Object.keys(categories),
                 datasets: [{
-                    data: [300, 150, 100],
-                    backgroundColor: ['#3B82F6', '#10B981', '#F59E0B'],
+                    data: Object.values(categories),
+                    backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
                 }]
             },
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Graphique circulaire
+        // 4. Graphique circulaire : Statut des commandes
+        const orderStatuses = {};
+        orders.forEach(o => {
+            const status = o.status || 'Unknown';
+            orderStatuses[status] = (orderStatuses[status] || 0) + 1;
+        });
+
         new Chart(document.getElementById('pieChart'), {
             type: 'pie',
             data: {
-                labels: ['Completed', 'Pending', 'Cancelled', 'Returned'],
+                labels: Object.keys(orderStatuses),
                 datasets: [{
-                    data: [300, 50, 10, 20],
+                    data: Object.values(orderStatuses),
                     backgroundColor: ['#10B981', '#F59E0B', '#EF4444', '#6B7280'],
                 }]
             },
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Graphique en zone polaire
+        // 5. Graphique polaire : Impact (Simulé)
         new Chart(document.getElementById('polarChart'), {
             type: 'polarArea',
             data: {
