@@ -16,7 +16,7 @@ const Components = {
             </div>
 
             <div class="flex items-center space-x-4">
-                <!-- Lang Dropdown -->
+                <!-- Menu déroulant de langue -->
                 <div class="relative group">
                     <button class="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-primary transition">
                         <span>${currentLang.toUpperCase()}</span>
@@ -31,7 +31,7 @@ const Components = {
 
                 <div class="h-6 w-px bg-gray-300 mx-2"></div>
 
-                <!-- User Profile -->
+                <!-- Profil utilisateur -->
                 <div class="flex items-center space-x-2">
                     <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">
                         ${user ? user.username.charAt(0).toUpperCase() : 'U'}

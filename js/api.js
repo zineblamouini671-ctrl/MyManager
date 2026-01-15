@@ -3,23 +3,23 @@ const API = {
 
     request: async (endpoint, options = {}) => {
         Store.setLoading(true);
-        // Simulate network delay
+        // Simuler un délai réseau
         await new Promise(r => setTimeout(r, 300));
 
         try {
             const method = options.method || 'GET';
             const body = options.body ? JSON.parse(options.body) : null;
 
-            // Route to DataService
-            // Endpoints: /users, /products, /users/1, /orders/user/1
+            // Router vers DataService
+            // Endpoints : /users, /products, /users/1, /orders/user/1
 
-            // Regex matchers
+            // Matchers Regex
             const parts = endpoint.split('/').filter(p => p);
             const resource = parts[0];
             const id = parts[1];
             const subResource = parts[2];
 
-            // Mapping resources to keys
+            // Mapper les ressources aux clés
             const map = {
                 'users': 'users',
                 'products': 'products',
@@ -30,7 +30,7 @@ const API = {
             };
             const key = map[resource];
 
-            if (!key) throw new Error('Unknown Resource');
+            if (!key) throw new Error('Ressource Inconnue');
 
             let data = null;
 
@@ -49,10 +49,10 @@ const API = {
             } else if (method === 'POST') {
                 data = await DataService.add(key, body);
             } else if (method === 'PUT') {
-                if (!id) throw new Error('ID required for PUT');
+                if (!id) throw new Error('ID requis pour PUT');
                 data = await DataService.update(key, id, body);
             } else if (method === 'DELETE') {
-                if (!id) throw new Error('ID required for DELETE');
+                if (!id) throw new Error('ID requis pour DELETE');
                 data = await DataService.delete(key, id);
             }
 

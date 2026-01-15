@@ -8,7 +8,7 @@ const Utils = {
         return str.charAt(0).toUpperCase() + str.slice(1);
     },
 
-    // Simple Pub/Sub for events
+    // Pub/Sub simple pour les événements
     events: {},
     on: (event, callback) => {
         if (!Utils.events[event]) Utils.events[event] = [];
@@ -18,7 +18,7 @@ const Utils = {
         if (Utils.events[event]) Utils.events[event].forEach(cb => cb(data));
     },
 
-    // i18n dictionary
+    // Dictionnaire i18n
     translations: {
         en: {
             dashboard: 'Dashboard',
@@ -89,6 +89,6 @@ const Utils = {
 
     setLang: (lang) => {
         localStorage.setItem('lang', lang);
-        location.reload(); // Simple reload to apply changes
+        location.reload(); // Rechargement simple pour appliquer les changements
     }
 };

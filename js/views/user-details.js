@@ -1,23 +1,23 @@
 const UserDetailsView = {
     render: async () => {
-        // Parse ID from hash: #user-details?id=1
+        // Analyser l'ID depuis le hash : #user-details?id=1
         const params = new URLSearchParams(window.location.hash.split('?')[1]);
         const id = params.get('id');
 
         if (!id) return '<div class="p-6 text-red-500">User ID missing</div>';
 
-        // Fetch single user
+        // Récupérer un seul utilisateur
         // const user = await API.get(`/users/${id}`);
         const users = await API.get('/users');
         const user = users.find(u => u.id == id);
 
-        // Fetch orders for this user - using special route supported by our new API.js logic
+        // Récupérer les commandes pour cet utilisateur - en utilisant une route spéciale supportée par notre nouvelle logique API.js
         const orders = await API.get(`/users/${id}/orders`) || []; // I need to implement this in API.js or use manual filter if not supported.
         .
 
         if(!user) return '<div class="p-6 text-red-500">User not found</div>';
 
-    // PDF Export Handler attached to window or delegate
+    // Gestionnaire d'export PDF attaché à window ou délégué
     window.exportUserPDF = () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -66,7 +66,7 @@ const UserDetailsView = {
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Contact Info -->
+                    <!-- Informations de contact -->
                     <div>
                         <h3 class="text-xl font-semibold mb-4 text-gray-700">Contact Information</h3>
                         <div class="space-y-3">
@@ -85,7 +85,7 @@ const UserDetailsView = {
                         </div>
                     </div>
 
-                    <!-- Company Info -->
+                    <!-- Informations sur l'entreprise -->
                      <div>
                         <h3 class="text-xl font-semibold mb-4 text-gray-700">Company</h3>
                         <div class="bg-gray-50 p-4 rounded-lg">
@@ -96,7 +96,7 @@ const UserDetailsView = {
                     </div>
                 </div>
 
-                <!-- Address -->
+                <!-- Adresse -->
                  <div class="mt-8">
                     <h3 class="text-xl font-semibold mb-4 text-gray-700">Address</h3>
                     <div class="bg-gray-50 p-4 rounded-lg flex items-start">
@@ -108,7 +108,7 @@ const UserDetailsView = {
                     </div>
                 </div>
 
-                <!-- Recent Orders -->
+                <!-- Commandes récentes -->
                 <div class="mt-8">
                     <h3 class="text-xl font-semibold mb-4 text-gray-700">Recent Orders (${orders.length})</h3>
                     <div class="space-y-4">
